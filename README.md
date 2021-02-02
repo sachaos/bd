@@ -1,5 +1,13 @@
 # bd - Binary Describe
 
+## Install
+
+```
+$ brew install sachaos/tap/bd
+```
+
+## Usage
+
 ```
 $ bd 0x45
 hex: 0x45
