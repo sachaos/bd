@@ -5,11 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
-	"strings"
 )
-
-const PrefixHex = "0x"
-const PrefixBin = "0b"
 
 func main() {
 	arg := os.Args[1]
@@ -19,52 +15,26 @@ func main() {
 		os.Exit(1)
 	}
 
-	Describe(parse.raw)
+	Describe(parse)
 }
 
-type Binary struct {
-	origin string
-	raw []byte
-}
-
-func Parse(origin string) (*Binary, error) {
-	switch origin[:2] {
-	case PrefixHex:
-		hexStr := strings.TrimPrefix(origin, PrefixHex)
-		decoded, err := hex.DecodeString(hexStr)
-		if err != nil {
-			return nil, err
-		}
-
-		return &Binary{
-			origin: origin,
-			raw:    decoded,
-		}, nil
-	case PrefixBin:
-		var decoded []byte
-		var str string
-		binStr := strings.TrimPrefix(origin, PrefixBin)
-
-		for i := len(binStr); i > 0; i -= 8 {
-			if i - 8 < 0 {
-				str = binStr[0:i]
-			} else {
-				str = binStr[i-8:i]
-			}
-			v, err := strconv.ParseUint(str, 2, 8)
-			if err != nil {
-				return nil, err
-			}
-			decoded = append(decoded, byte(v))
-		}
-
-		return &Binary{
-			origin: origin,
-			raw:    decoded,
-		}, nil
+func Parse(origin string) ([]byte, error) {
+	parsed, err := strconv.ParseInt(origin, 0, 0)
+	if err != nil {
+		return nil, err
 	}
 
-	return nil, fmt.Errorf("unknown format")
+	str := strconv.FormatInt(parsed, 16)
+	if len(str)%2 == 1 {
+		str = "0" + str
+	}
+
+	decodeString, err := hex.DecodeString(str)
+	if err != nil {
+		return nil, err
+	}
+
+	return decodeString, nil
 }
 
 func Describe(b []byte) {
@@ -73,5 +43,5 @@ func Describe(b []byte) {
 	fmt.Printf("bytes: %v\n", b)
 	fmt.Printf("binary: %08b\n", b)
 	fmt.Println()
-	fmt.Printf("length: %dbit, %dbytes\n", len(b) * 8, len(b))
+	fmt.Printf("length: %dbit, %dbytes\n", len(b)*8, len(b))
 }
