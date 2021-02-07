@@ -58,7 +58,7 @@ func Describe(b []byte) {
 }
 
 func JsonOut(b []byte) {
-	json.NewEncoder(os.Stdout).Encode(map[string]interface{}{
+	_ = json.NewEncoder(os.Stdout).Encode(map[string]interface{}{
 		"hex":         hex.EncodeToString(b),
 		"string":      fmt.Sprintf("%s", b),
 		"bytes":       fmt.Sprintf("%v", b),
